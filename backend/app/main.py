@@ -546,7 +546,8 @@ async def missing_subs(uid, s, fresh=False):
     miss = []
     for c in chans:
         try:
-            if (await BOT.get_chat_member(c["chat"], uid)).status in ("left", "kicked"): miss.append(c)
+            cm = await BOT.get_chat_member(c["chat"], uid)
+            if cm.status in ("left", "kicked") or (cm.status == "restricted" and not getattr(cm, "is_member", True)): miss.append(c)
         except Exception as e: log.warning("obuna tekshiruvi %s: %s", c["chat"], e)  # bot kanalda admin emas -> bloklamaymiz
     SUB_CACHE[uid] = (time.time(), miss)
     return miss
